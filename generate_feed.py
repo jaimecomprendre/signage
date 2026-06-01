@@ -1,5 +1,6 @@
 import os
 import time
+import urllib.parse
 import xml.etree.ElementTree as ET
 from xml.dom import minidom
 
@@ -8,7 +9,7 @@ from watchdog.events import FileSystemEventHandler
 
 MEDIA_DIR = "/media"
 OUTPUT_DIR = "/app/rss"
-BASE_URL = os.environ.get("BASE_URL", "http://192.168.0.3:8000")
+BASE_URL = os.environ.get("BASE_URL", "http://192.168.0.5:8000")
 FEED_TITLE = "Auto Signage Feed"
 SUPPORTED_EXTENSIONS = {
     ".jpg":  ("image/jpeg", "image"),
@@ -48,7 +49,10 @@ def build_feed(folder_path, folder_name):
             continue
 
         mime_type, medium = SUPPORTED_EXTENSIONS[ext]
-        file_url = f"{BASE_URL}/media/{folder_name}/{filename}"
+        # URL-encode folder and filename to handle spaces and special characters
+        encoded_folder = urllib.parse.quote(folder_name)
+        encoded_filename = urllib.parse.quote(filename)
+        file_url = f"{BASE_URL}/media/{encoded_folder}/{encoded_filename}"
         filepath = os.path.join(folder_path, filename)
         file_size = get_file_size(filepath)
         item_count += 1
@@ -59,7 +63,6 @@ def build_feed(folder_path, folder_name):
         ET.SubElement(item, "link").text = file_url
         ET.SubElement(item, "description").text = file_url
         ET.SubElement(item, "guid", {"isPermaLink": "false"}).text = guid
-        ET.SubElement(item, "medium").text = medium
         ET.SubElement(item, "media:content", {
             "url":      file_url,
             "fileSize": str(file_size),
@@ -102,7 +105,6 @@ def generate_all_feeds():
 
 class MediaChangeHandler(FileSystemEventHandler):
     def on_any_event(self, event):
-        # Ignore directory events and hidden/temp files
         if event.is_directory:
             return
         if os.path.basename(event.src_path).startswith("."):
