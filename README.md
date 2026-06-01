@@ -28,4 +28,7 @@ docker compose up --build -d
 
 ## Feed output
 
-Generated RSS files are written to `rss/`.
+Generated RSS files are written to `rss/`
+
+
+file_url = f"{BASE_URL}/media/{urllib.parse.quote(folder_name)}/{urllib.parse.quote(filename)}"
