@@ -8,7 +8,7 @@ from watchdog.events import FileSystemEventHandler
 
 MEDIA_DIR = "/media"
 OUTPUT_DIR = "/app/rss"
-BASE_URL = os.environ.get("BASE_URL", "http://localhost:8000")
+BASE_URL = os.environ.get("BASE_URL", "http://192.168.0.3:8000")
 FEED_TITLE = "Auto Signage Feed"
 SUPPORTED_EXTENSIONS = {
     ".jpg":  ("image/jpeg", "image"),
@@ -59,6 +59,7 @@ def build_feed(folder_path, folder_name):
         ET.SubElement(item, "link").text = file_url
         ET.SubElement(item, "description").text = file_url
         ET.SubElement(item, "guid", {"isPermaLink": "false"}).text = guid
+        ET.SubElement(item, "medium").text = medium
         ET.SubElement(item, "media:content", {
             "url":      file_url,
             "fileSize": str(file_size),
