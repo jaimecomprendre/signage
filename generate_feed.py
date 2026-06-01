@@ -4,7 +4,7 @@ import urllib.parse
 import xml.etree.ElementTree as ET
 from xml.dom import minidom
 
-from watchdog.observers import Observer
+from watchdog.observers.polling import PollingObserver
 from watchdog.events import FileSystemEventHandler
 
 MEDIA_DIR = "/media"
@@ -122,7 +122,7 @@ if __name__ == "__main__":
 
     print(f"[WATCH] Monitoring '{MEDIA_DIR}' for changes...")
     handler = MediaChangeHandler()
-    observer = Observer()
+    observer = PollingObserver()
     observer.schedule(handler, MEDIA_DIR, recursive=True)
     observer.start()
 
